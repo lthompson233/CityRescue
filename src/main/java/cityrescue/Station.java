@@ -1,14 +1,38 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package cityrescue;
 
-/**
- *
- * @author cosmofolder
- */
+
 public class Station {
+    private String stationname;
+    private int xcoord;
+    private int ycoord;
+    private int stationId;
+    private int maxUnits;
+    
+    public void initialisestation(String stationname, int x, int y, int stationId){
+        stationname = this.stationname;
+        this.xcoord = x;
+        this.ycoord = y;
+        stationId = this.stationId;
+
+    }
+
+    public int getx(){
+        return xcoord;
+    }
+    public int gety(){
+        return ycoord;
+    }
+    public int getstationId(){
+        return stationId;
+    }
+    public String getstationname(){
+        return stationname;
+    }
+    public int getmaxUnits(){
+        return maxUnits;
+    }
+    public void setmaxUnits(int maxunits){
+        maxUnits = maxunits;
+    }
 
 }
