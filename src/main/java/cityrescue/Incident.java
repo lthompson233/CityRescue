@@ -1,17 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 
 package cityrescue;
 
 import cityrescue.enums.IncidentStatus;
 import cityrescue.enums.IncidentType;
 
-/**
- *
- * @author cosmofolder
- */
+
 public class Incident {
     private int incidentId;
     private IncidentType incidenttype;
@@ -22,7 +16,7 @@ public class Incident {
     private IncidentStatus incidentStatus;
 
     
-    public void initialise(int incidentId, IncidentType incidenttype, int x, int y ){
+    public void initialiseincident(int incidentId, IncidentType incidenttype, int x, int y ){
         incidentId = this.incidentId;
         incidenttype = this.incidenttype;
         incidentStatus = IncidentStatus.REPORTED;
@@ -30,10 +24,10 @@ public class Incident {
         ycoord = y;
     }
 
-    public int getxcoord(){
+    public int getincidentxcoord(){
         return xcoord;
     }
-    public int getycoord(){
+    public int getincidentycoord(){
         return ycoord;
     }
     public IncidentType getincidenttype(){
@@ -55,11 +49,18 @@ public class Incident {
         unit = unitid;
     }
     public void incrementstatus(){
+
         IncidentStatus[] values = IncidentStatus.values();
         int currentindex = incidentStatus.ordinal();
         if (currentindex < values.length - 1){
             incidentStatus = values[currentindex + 1];
         }
+    }
+    public void setseverity(int severity){
+        severity = this.severity;
+    }
+    public void cancelIncident(){
+        incidentStatus = IncidentStatus.CANCELLED;
     }
 
 }
