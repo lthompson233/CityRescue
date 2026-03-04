@@ -16,7 +16,7 @@ public class Incident {
     private IncidentStatus incidentStatus;
 
     
-    public void initialiseincident(int incidentId, IncidentType incidenttype, int x, int y ){
+    public Incident(int incidentId, IncidentType incidenttype, int x, int y ){
         incidentId = this.incidentId;
         incidenttype = this.incidenttype;
         incidentStatus = IncidentStatus.REPORTED;

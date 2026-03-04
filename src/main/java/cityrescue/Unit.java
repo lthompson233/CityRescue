@@ -1,14 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 
 package cityrescue;
+import cityrescue.enums.UnitStatus;
 
-/**
- *
- * @author cosmofolder
- */
-public class Unit {
 
+public abstract class Unit {
+    protected int unitId;
+    protected int xcoord;
+    protected int ycoord;
+    protected UnitStatus unitStatus;
+    protected int incident;
+    protected int work;
+    protected int requiredwork;
+    protected int stationId;
+
+    public Unit(int unitId, int stationId, int xcoord, int ycoord){
+        unitId = this.unitId;
+        stationId = this.stationId;
+        xcoord = this.xcoord;
+        ycoord = this.ycoord;
+        unitStatus = UnitStatus.IDLE;
+    }
 }

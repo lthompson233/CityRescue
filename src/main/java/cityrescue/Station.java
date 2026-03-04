@@ -8,7 +8,7 @@ public class Station {
     private int stationId;
     private int maxUnits;
     
-    public void initialisestation(String stationname, int x, int y, int stationId){
+    public Station(String stationname, int x, int y, int stationId){
         stationname = this.stationname;
         this.xcoord = x;
         this.ycoord = y;
