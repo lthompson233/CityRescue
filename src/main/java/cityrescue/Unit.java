@@ -30,6 +30,12 @@ public abstract class Unit {
     public int gety(){
         return ycoord;
     }
+    public void setx(int x){
+        xcoord = x;
+    }
+    public void sety(int y){
+        ycoord = y;
+    }
     public UnitStatus getunUnitStatus(){
         return unitStatus;
     }
