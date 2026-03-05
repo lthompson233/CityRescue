@@ -148,7 +148,6 @@ public class CityRescueImpl implements CityRescue {
             }
             if (stationHasNoUnits){
                 cityMap.mapXY(station.getx(), station.gety()).setStation(null);
-                //stationCounter--; --------------------------------------------------------------------------------------
             }
             else{
                 throw new IllegalStateException("station has units so it cannot be removed");
@@ -214,35 +213,42 @@ public class CityRescueImpl implements CityRescue {
 
         Station station = stations.get(stationId);
         if (station != null){
-            for (Unit unit : units.values()) {
-                if (unit.getstationId() == stationId){
-                    stationUnitCounter++;
+            if (units.size() < MAX_UNITS)
+            {
+                for (Unit unit : units.values()) {
+                    if (unit.getstationId() == stationId){
+                        stationUnitCounter++;
+                    }
                 }
-            }
-            if (stationUnitCounter < station.getmaxUnits()){
-                Unit unitNew;
-                switch (type) {
-                    case AMBULANCE:
-                        unitNew = new Ambulance(unitCounter, stationId, station.getx(), station.gety());
-                        break;
-                    case FIRE_ENGINE:
-                        unitNew = new FireEngine(unitCounter, stationId, station.getx(), station.gety());
-                        break;
-                    case POLICE_CAR:
-                        unitNew = new PoliceCar(unitCounter, stationId, station.getx(), station.gety());
-                        break;
-                
-                    default:
-                        throw new IllegalStateException("unit type is invalid");
+                if (stationUnitCounter < station.getmaxUnits()){
+                    Unit unitNew;
+                    switch (type) {
+                        case AMBULANCE:
+                            unitNew = new Ambulance(unitCounter, stationId, station.getx(), station.gety());
+                            break;
+                        case FIRE_ENGINE:
+                            unitNew = new FireEngine(unitCounter, stationId, station.getx(), station.gety());
+                            break;
+                        case POLICE_CAR:
+                            unitNew = new PoliceCar(unitCounter, stationId, station.getx(), station.gety());
+                            break;
+                    
+                        default:
+                            throw new IllegalStateException("unit type is invalid");
+                    }
+                    // update map
+                    cityMap.mapXY(station.getx(), station.gety()).addUnit(unitNew);
+                    units.put(unitCounter++, unitNew);
+                    return unitNew.getunitId();
                 }
-                // update map
-                cityMap.mapXY(station.getx(), station.gety()).addUnit(unitNew);
-                units.put(unitCounter++, unitNew);
-                return unitNew.getunitId();
+                else{
+                    throw new InvalidUnitException("capacity of station is full");
+                }
             }
             else{
-                throw new InvalidUnitException("capacity of station is full");
+                throw new IDNotRecognisedException("already max units");
             }
+            
         }
         else{
             throw new IDNotRecognisedException("station cannot be found");
@@ -258,7 +264,6 @@ public class CityRescueImpl implements CityRescue {
             if (unit.getUnitStatus() == UnitStatus.IDLE){
                 unit.decommissionUnit();
                 units.remove(unitId);
-                //unitCounter--; --------------------------------------------------------------------------------------
                 cityMap.mapXY(unit.getx(), unit.gety()).removeUnit(unit);
             }
             else{
@@ -371,21 +376,29 @@ public class CityRescueImpl implements CityRescue {
     public int reportIncident(IncidentType type, int severity, int x, int y) throws InvalidSeverityException, InvalidLocationException {
         // TODO: implement
 
-        if (checkXYwithinBounds(x, y)){
-            if (severity > 0 && severity < 6){
-                Incident incident = new Incident(incidentCounter, type, x, y, severity);
-                incidents.put(incidentCounter++, incident);
-                cityMap.mapXY(incident.getx(), incident.gety()).setIncident(incident);
+        
+        if (incidents.size() < MAX_INCIDENTS){
+            if (checkXYwithinBounds(x, y)){
+                if (severity > 0 && severity < 6){
+                    Incident incident = new Incident(incidentCounter, type, x, y, severity);
+                    incidents.put(incidentCounter++, incident);
+                    cityMap.mapXY(incident.getx(), incident.gety()).setIncident(incident);
+                }
+                else{
+                    throw new InvalidSeverityException("severity not in bounds");
+                }
             }
             else{
-                throw new InvalidSeverityException("severity not in bounds");
+                throw new InvalidLocationException("x and y are not in bounds of map");
             }
+            
+            return incidentCounter;
         }
         else{
-            throw new InvalidLocationException("x and y are not in bounds of map");
+            throw new InvalidLocationException("too many incidents");
         }
+
         
-        return incidentCounter;
     }
 
     @Override
@@ -524,7 +537,6 @@ public class CityRescueImpl implements CityRescue {
                 
                 ix = incidents.get(u.getincident()).getx();
                 iy = incidents.get(u.getincident()).gety();
-                int c = 0;
                 boolean flag = false;
                 for (int[] d: directions){
                     newux = ux +d[0];
@@ -540,7 +552,6 @@ public class CityRescueImpl implements CityRescue {
                                 break;
                         }
                     }
-                    c++;
                 }
                 if (!flag){
                     for (int[] d: directions){
@@ -591,5 +602,7 @@ public class CityRescueImpl implements CityRescue {
             status+="U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+
             " INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork()))+"\n";
         }
+
+        return status;
     }
 }
