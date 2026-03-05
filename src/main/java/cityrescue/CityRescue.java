@@ -1,7 +1,14 @@
 package cityrescue;
 
-import cityrescue.enums.*;
-import cityrescue.exceptions.*;
+import cityrescue.enums.IncidentType;
+import cityrescue.enums.UnitType;
+import cityrescue.exceptions.IDNotRecognisedException;
+import cityrescue.exceptions.InvalidCapacityException;
+import cityrescue.exceptions.InvalidGridException;
+import cityrescue.exceptions.InvalidLocationException;
+import cityrescue.exceptions.InvalidNameException;
+import cityrescue.exceptions.InvalidSeverityException;
+import cityrescue.exceptions.InvalidUnitException;
 
 public interface CityRescue {
     void initialise(int width, int height) throws InvalidGridException;
@@ -10,7 +17,7 @@ public interface CityRescue {
     void addObstacle(int x, int y) throws InvalidLocationException;
     void removeObstacle(int x, int y) throws InvalidLocationException;
 
-    int addStation(String name, int x, int y) throws InvalidNameException, InvalidLocationException;
+    int addStation(String name, int x, int y) throws InvalidNameException, InvalidLocationException, InvalidCapacityException;
     void removeStation(int stationId) throws IDNotRecognisedException, IllegalStateException;
     void setStationCapacity(int stationId, int maxUnits) throws IDNotRecognisedException, InvalidCapacityException;
     int[] getStationIds();

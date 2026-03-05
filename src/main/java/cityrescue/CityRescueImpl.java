@@ -1,5 +1,6 @@
 package cityrescue;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -66,10 +67,8 @@ public class CityRescueImpl implements CityRescue {
             cityMap = new CityMap(width, height);
         }
         else{
-            // width or height zero or belo / bigger than bounds
+            throw new InvalidGridException("Invalid grid bounds");
         }
-        
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -88,7 +87,7 @@ public class CityRescueImpl implements CityRescue {
             obstacleCounter++;
         }
         else{
-            // width or height zero or belo / bigger than bounds
+            throw new InvalidLocationException("Invalid location, it is outside of bounds");
         }
 
         throw new UnsupportedOperationException("Not implemented yet");
@@ -103,14 +102,12 @@ public class CityRescueImpl implements CityRescue {
             obstacleCounter--;
         }
         else{
-            // width or height zero or belo / bigger than bounds
+            throw new InvalidLocationException("invalid location, it is outside of bounds");
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public int addStation(String name, int x, int y) throws InvalidNameException, InvalidLocationException {
+    public int addStation(String name, int x, int y) throws InvalidNameException, InvalidLocationException, InvalidCapacityException{
         // TODO: implement
 
         if (checkXYwithinBounds(x, y)){
@@ -122,18 +119,16 @@ public class CityRescueImpl implements CityRescue {
                     cityMap.addStation(newStation);
                 }
                 else{
-                    // obstruction
+                    throw new InvalidLocationException("there is already something there");
                 }
             }
             else{
-                // max stations reached
+                throw new InvalidCapacityException("you have reached the maximum amount of stations");
             }
         }
         else{
-            // width or height zero or belo / bigger than bounds
+            throw new InvalidLocationException("out of bounds of the map");
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -155,14 +150,12 @@ public class CityRescueImpl implements CityRescue {
                 //stationCounter--; --------------------------------------------------------------------------------------
             }
             else{
-                // station has units
+                throw new IllegalStateException("station has units so it cannot be removed");
             }
         }
         else{
-            // station not found
+            throw new IDNotRecognisedException("station cannot be found");
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -184,20 +177,18 @@ public class CityRescueImpl implements CityRescue {
                     station.setmaxUnits(maxUnits);
                 }
                 else{
-                    // maxUnits belo 1
+                    throw new InvalidCapacityException("cannot set a capacity of less than 1");
                 }
                 
             }
             else{
-                // more units in station than maxUnits
+                throw new InvalidCapacityException("cannot set capacity to less than the number of current units");
             }
             
         }
         else{
-            // station not found
+            throw new IDNotRecognisedException("station cannot be found");
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -241,8 +232,7 @@ public class CityRescueImpl implements CityRescue {
                         break;
                 
                     default:
-                        // illigul type
-                        return -1;
+                        throw new IllegalStateException("unit type is invalid");
                 }
                 // update map
                 cityMap.mapXY(station.getx(), station.gety()).addUnit(unitNew);
@@ -250,14 +240,12 @@ public class CityRescueImpl implements CityRescue {
                 return unitNew.getunitId();
             }
             else{
-                // station full
+                throw new InvalidUnitException("capacity of station is full");
             }
         }
         else{
-            // station not found
+            throw new IDNotRecognisedException("station cannot be found");
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -265,17 +253,20 @@ public class CityRescueImpl implements CityRescue {
         // TODO: implement
 
         Unit unit = units.get(unitId);
-        if (unit.getUnitStatus() == UnitStatus.IDLE){
-            unit.decommissionUnit();
-            units.remove(unitId);
-            //unitCounter--; --------------------------------------------------------------------------------------
-            cityMap.mapXY(unit.getx(), unit.gety()).removeUnit(unit);
+        if (unit != null){
+            if (unit.getUnitStatus() == UnitStatus.IDLE){
+                unit.decommissionUnit();
+                units.remove(unitId);
+                //unitCounter--; --------------------------------------------------------------------------------------
+                cityMap.mapXY(unit.getx(), unit.gety()).removeUnit(unit);
+            }
+            else{
+                throw new IllegalStateException("unit has to be idle to be decommissioned");
+            }
         }
         else{
-            // unit busy
+            throw new IDNotRecognisedException("unit not found");
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -301,28 +292,24 @@ public class CityRescueImpl implements CityRescue {
                             cityMap.mapXY(unit.getx(), unit.gety()).addUnit(unit);
                         }
                         else{
-                            // new station full
+                            throw new IllegalStateException("station is full unit cannot be added");
                         }
                     }   
                     else{
-                        // new station same as old
+                        throw new IllegalStateException("cannot transfer unit to a station it is already in");
                     }
                 }
                 else{
-                // station not found
+                    throw new IDNotRecognisedException("station cannot be found");
                 }
             }
             else{
-                // unit not idle
+                throw new IllegalStateException("unit has to be idle to be transferred");
             }
         }
         else{
-            // unit not found
+            throw new IDNotRecognisedException("unit not found");
         }
-
-        
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -340,26 +327,27 @@ public class CityRescueImpl implements CityRescue {
                     unit.setUnitStatus(UnitStatus.IDLE);
                 }
             }
+            else{
+                throw new IllegalStateException("unit has to be idle or out of service");
+            }
         }
         else{
-            // unit not found
+            throw new IDNotRecognisedException("unit not found");
         }
- 
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
-        @Override
-        public int[] getUnitIds() {
-            int i = 0;
-            int[] unitIds = new int[unitCounter];
+    @Override
+    public int[] getUnitIds() {
+        int i = 0;
+        int[] unitIds = new int[unitCounter];
 
-            for(Integer unitId : units.keySet()){
-                unitIds[i] = unitId;
-                i++;
-            }
-
-            return unitIds;
+        for(Integer unitId : units.keySet()){
+            unitIds[i] = unitId;
+            i++;
         }
+
+        return unitIds;
+    }
 
     @Override
     public String viewUnit(int unitId) throws IDNotRecognisedException {
@@ -372,7 +360,7 @@ public class CityRescueImpl implements CityRescue {
             System.out.println(unitString);
         }
         else{
-            // unit not found
+            throw new IDNotRecognisedException("unit not found");
         }
 
         return unitString;
@@ -389,11 +377,11 @@ public class CityRescueImpl implements CityRescue {
                 cityMap.mapXY(incident.getx(), incident.gety()).setIncident(incident);
             }
             else{
-                // severity not in bounds
+                throw new InvalidSeverityException("severity not in bounds");
             }
         }
         else{
-            // x / y not in bounds
+            throw new InvalidLocationException("x and y are not in bounds of map");
         }
         
         return incidentCounter;
@@ -416,12 +404,13 @@ public class CityRescueImpl implements CityRescue {
                 units.get(incident.getunit()).setincident(0);
                 cityMap.mapXY(incident.getx(), incident.gety()).removeIncident();
             }
+            else{
+                throw new IllegalStateException("incident needs to be either reported or dispatched");
+            }
         }
         else{
-            // incident not found
+            throw new IDNotRecognisedException("incident not found");
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -434,19 +423,16 @@ public class CityRescueImpl implements CityRescue {
                     i.setseverity(newSeverity);
                 }
                 else{
-                    //throw invalid incident status
+                    throw new IllegalStateException("incident needs to be in cancelled or resolved state");
                 }
             }
             else{
-                // throw invalid severity
+                throw new InvalidSeverityException("severity is out of bounds");
             }
         }
         else{
-            // throw invalid id
+            throw new IDNotRecognisedException("incident id not found");
         }
-
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -460,7 +446,6 @@ public class CityRescueImpl implements CityRescue {
             i++; 
         }
         return incidentIds;
-
     }
 
    @Override
@@ -474,9 +459,8 @@ public class CityRescueImpl implements CityRescue {
             return string;
         }
         else{
-            //throw error for invalid id
+            throw new IDNotRecognisedException("incident id not found");
         }
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -509,8 +493,6 @@ public class CityRescueImpl implements CityRescue {
                 i.setunit(selectedunit.getunitId());
             }
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -591,7 +573,6 @@ public class CityRescueImpl implements CityRescue {
             }
 
         }
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -611,7 +592,5 @@ public class CityRescueImpl implements CityRescue {
             System.out.println("U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+
             " INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork())));
         }
-
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 }
