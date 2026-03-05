@@ -1,6 +1,5 @@
 package cityrescue;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -69,6 +68,17 @@ public class CityRescueImpl implements CityRescue {
         else{
             throw new InvalidGridException("Invalid grid bounds");
         }
+        
+        stations = new HashMap<>();
+        units = new HashMap<>();
+        incidents = new HashMap<>();
+
+        stationCounter = 0;
+        unitCounter = 0;
+        incidentCounter = 0;
+        obstacleCounter = 0;
+
+        tick = 0;
     }
 
     @Override
