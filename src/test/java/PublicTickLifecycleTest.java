@@ -33,5 +33,14 @@ public class PublicTickLifecycleTest {
         cr.tick();
         assertTrue(cr.viewIncident(i).contains("STATUS=RESOLVED"));
         assertTrue(cr.viewUnit(u).contains("STATUS=IDLE"));
+        
+
+        cr = new CityRescueImpl();
+        cr.initialise(5, 5);
+
+        int s1 = cr.addStation("monkey 1", 0, 0);
+        int s3 = cr.addStation("monkey 3", 0, 1);
+
+        cr.removeStation(1);
     }
 }
