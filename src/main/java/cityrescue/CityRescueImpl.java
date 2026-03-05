@@ -146,6 +146,7 @@ public class CityRescueImpl implements CityRescue {
             }
             if (stationHasNoUnits){
                 cityMap.mapXY(station.getx(), station.gety()).setStation(null);
+                //stationCounter--; --------------------------------------------------------------------------------------
             }
             else{
                 // station has units
@@ -260,6 +261,8 @@ public class CityRescueImpl implements CityRescue {
         Unit unit = units.get(unitId);
         if (unit.getUnitStatus() == UnitStatus.IDLE){
             unit.decommissionUnit();
+            units.remove(unitId);
+            //unitCounter--; --------------------------------------------------------------------------------------
             cityMap.mapXY(unit.getx(), unit.gety()).removeUnit(unit);
         }
         else{
@@ -322,54 +325,151 @@ public class CityRescueImpl implements CityRescue {
 
         Unit unit = units.get(unitId);
         if(unit != null){
-            // out of service
+            if (unit.getUnitStatus() == UnitStatus.IDLE || unit.getUnitStatus() == UnitStatus.OUT_OF_SERVICE)
+            {
+                if (outOfService){
+                    unit.setUnitStatus(UnitStatus.OUT_OF_SERVICE);
+                }
+                else{
+                    unit.setUnitStatus(UnitStatus.IDLE);
+                }
+            }
+        }
+        else{
+            // unit not found
+        }
+ 
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+        @Override
+        public int[] getUnitIds() {
+            int i = 0;
+            int[] unitIds = new int[unitCounter];
+
+            for(Integer unitId : units.keySet()){
+                unitIds[i] = unitId;
+                i++;
+            }
+
+            return unitIds;
+        }
+
+    @Override
+    public String viewUnit(int unitId) throws IDNotRecognisedException {
+        // TODO: implement
+        String unitString = "";
+
+        Unit unit = units.get(unitId);
+        if(unit != null){
+            unitString = "U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+" INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork()));
+            System.out.println(unitString);
         }
         else{
             // unit not found
         }
 
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public int[] getUnitIds() {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public String viewUnit(int unitId) throws IDNotRecognisedException {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        return unitString;
     }
 
     @Override
     public int reportIncident(IncidentType type, int severity, int x, int y) throws InvalidSeverityException, InvalidLocationException {
         // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+
+        if (checkXYwithinBounds(x, y)){
+            if (severity > 0 && severity < 6){
+                Incident incident = new Incident(incidentCounter, type, x, y, severity);
+                incidents.put(incidentCounter++, incident);
+                cityMap.mapXY(incident.getx(), incident.gety()).setIncident(incident);
+            }
+            else{
+                // severity not in bounds
+            }
+        }
+        else{
+            // x / y not in bounds
+        }
+        
+        return incidentCounter;
     }
 
     @Override
     public void cancelIncident(int incidentId) throws IDNotRecognisedException, IllegalStateException {
         // TODO: implement
+
+        Incident incident = incidents.get(incidentId);
+        if (incident != null){
+            if (incident.incidentStatus() == IncidentStatus.REPORTED){
+                incident.cancelIncident();
+                cityMap.mapXY(incident.getx(), incident.gety()).removeIncident();
+            }
+            else if (incident.incidentStatus() == IncidentStatus.DISPATCHED){
+                incident.cancelIncident();
+                
+                units.get(incident.getunit()).setUnitStatus(UnitStatus.IDLE);
+                units.get(incident.getunit()).setincident(0);
+                cityMap.mapXY(incident.getx(), incident.gety()).removeIncident();
+            }
+        }
+        else{
+            // incident not found
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void escalateIncident(int incidentId, int newSeverity) throws IDNotRecognisedException, InvalidSeverityException, IllegalStateException {
         // TODO: implement
+        Incident i = incidents.get(incidentId);
+        if (i != null){
+            if (newSeverity < 1 || newSeverity > 5){
+                if (i.incidentStatus() != IncidentStatus.CANCELLED && i.incidentStatus() != IncidentStatus.RESOLVED){
+                    i.setseverity(newSeverity);
+                }
+                else{
+                    //throw invalid incident status
+                }
+            }
+            else{
+                // throw invalid severity
+            }
+        }
+        else{
+            // throw invalid id
+        }
+
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public int[] getIncidentIds() {
         // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+
+        int i = 0;
+        int[] incidentIds = new int[incidentCounter];
+        for (Integer incidentId : incidents.keySet()){
+            incidentIds[i] = incidentId;
+            i++; 
+        }
+        return incidentIds;
+
     }
 
-    @Override
+   @Override
     public String viewIncident(int incidentId) throws IDNotRecognisedException {
         // TODO: implement
+
+        Incident i = incidents.get(incidentId);
+        if (i != null ){
+            String string = "I#"+i.getincidentId()+ " TYPE="+i.getincidenttype()+" SEV="+i.getseverity()+" LOC=("+i.getx()+","+i.gety()+") STATUS="+i.getincidenttype()+
+            " UNIT="+ ((i.getunit() == 0) ? "-" : i.getunit());
+            return string;
+        }
+        else{
+            //throw error for invalid id
+        }
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -377,12 +477,31 @@ public class CityRescueImpl implements CityRescue {
     public void dispatch() {
         // TODO: implement
 
-        /* For each REPORTED incident (lowest id first),
-        assign the best eligible unit using tie-breakers.
-        Sets incident DISPATCHED and unit EN_ROUTE.   */
-
+        ArrayList<Incident> reportedincidents = new ArrayList<>();
         for (Incident incident : incidents.values()){
-            if (incident)
+            if (incident.incidentStatus() == IncidentStatus.REPORTED){
+                reportedincidents.add(incident);
+            }
+        }
+        for(Incident i : reportedincidents){
+            ArrayList<Unit> validUnits = new ArrayList<>();
+            for (Unit u : units.values()){
+                if (u.handlingrules() == i.getincidenttype()){
+                    validUnits.add(u);
+                }
+            }
+            validUnits.sort((u1,u2) -> {
+                int n1 = u1.findmanhattandistance(i.getx(), i.gety(), u1.getx(), u1.gety());
+                int n2 = u2.findmanhattandistance(i.getx(), i.gety(), u2.getx(), u2.gety());
+                return Integer.compare(n1, n2);
+            });
+            if (!validUnits.isEmpty()){
+                i.incidentStatus();
+                Unit selectedunit = validUnits.get(0);
+                selectedunit.incrementstatus();
+                selectedunit.setincident(i.getincidentId()); 
+                i.setunit(selectedunit.getunitId());
+            }
         }
 
         throw new UnsupportedOperationException("Not implemented yet");
@@ -481,8 +600,8 @@ public class CityRescueImpl implements CityRescue {
             " UNIT="+ ((incident.getunit() == 0) ? "-" : incident.getunit()));
         }
 
+        System.out.println("UNITS");
         for (Unit unit : units.values()){
-            System.out.println("UNITS");
             System.out.println("U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+
             " INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork())));
         }

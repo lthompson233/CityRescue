@@ -16,12 +16,13 @@ public class Incident {
     private IncidentStatus incidentStatus;
 
     
-    public Incident(int incidentId, IncidentType incidenttype, int x, int y ){
+    public Incident(int incidentId, IncidentType incidenttype, int x, int y, int severity){
         incidentId = this.incidentId;
         incidenttype = this.incidenttype;
         incidentStatus = IncidentStatus.REPORTED;
         xcoord = x;
         ycoord = y;
+        this.severity = severity;
     }
 
     public int getx(){
@@ -60,9 +61,7 @@ public class Incident {
         severity = this.severity;
     }
     public void cancelIncident(){
-        if ((incidentStatus == IncidentStatus.REPORTED) &&(incidentStatus == IncidentStatus.DISPATCHED)){
-            incidentStatus = IncidentStatus.CANCELLED;
-        }
+        incidentStatus = IncidentStatus.CANCELLED;
     }
 
 }
