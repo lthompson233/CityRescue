@@ -480,7 +480,7 @@ public class CityRescueImpl implements CityRescue {
 
         Incident i = incidents.get(incidentId);
         if (i != null ){
-            String string = "I#"+i.getincidentId()+ " TYPE="+i.getincidenttype()+" SEV="+i.getseverity()+" LOC=("+i.getx()+","+i.gety()+") STATUS="+i.getincidenttype()+
+            String string = "I#"+i.getincidentId()+ " TYPE="+i.getincidenttype()+" SEV="+i.getseverity()+" LOC=("+i.getx()+","+i.gety()+") STATUS="+i.incidentStatus()+
             " UNIT="+ ((i.getunit() == 0) ? "-" : i.getunit());
             return string;
         }
@@ -608,7 +608,7 @@ public class CityRescueImpl implements CityRescue {
         String status = "TICK="+tick +"\n" +"STATIONS="+stationCounter+" UNITS="+unitCounter+" INCIDENTS="+incidentCounter+" OBSTACLES="+obstacleCounter+"\n";
         status +="INCIDENTS \n";
         for (Incident incident : incidents.values()){
-            status += "I#"+incident.getincidentId()+ " TYPE="+incident.getincidenttype()+" SEV="+incident.getseverity()+" LOC=("+incident.getx()+","+incident.gety()+") STATUS="+incident.getincidenttype()+
+            status += "I#"+incident.getincidentId()+ " TYPE="+incident.getincidenttype()+" SEV="+incident.getseverity()+" LOC=("+incident.getx()+","+incident.gety()+") STATUS="+incident.incidentStatus()+
             " UNIT="+ ((incident.getunit() == 0) ? "-" : incident.getunit())+"\n";
         }
 
@@ -617,7 +617,6 @@ public class CityRescueImpl implements CityRescue {
             status+="U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+
             " INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork()))+"\n";
         }
-        System.out.println(status);
         return status;
     }
 }

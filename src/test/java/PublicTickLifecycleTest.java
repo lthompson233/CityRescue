@@ -1,9 +1,11 @@
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import cityrescue.*;
-import cityrescue.enums.*;
-import cityrescue.exceptions.*;
+import cityrescue.CityRescue;
+import cityrescue.CityRescueImpl;
+import cityrescue.enums.IncidentType;
+import cityrescue.enums.UnitType;
 
 public class PublicTickLifecycleTest {
     private CityRescue cr;
@@ -20,9 +22,11 @@ public class PublicTickLifecycleTest {
         int u = cr.addUnit(s, UnitType.AMBULANCE);
 
         int i = cr.reportIncident(IncidentType.MEDICAL, 1, 0, 1);
+
         cr.dispatch();
 
         cr.tick(); // should arrive at (0,1) in one tick
+
         assertTrue(cr.viewUnit(u).contains("LOC=(0,1)"));
 
         cr.tick();
