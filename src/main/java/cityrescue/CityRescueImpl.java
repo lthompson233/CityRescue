@@ -20,6 +20,8 @@ public class CityRescueImpl implements CityRescue {
     private final int MAX_UNITS = 50;
     private final int MAX_INCIDENTS = 200;
 
+    
+
 
     private HashMap<Integer, Station> stations;
     private HashMap<Integer, Unit> units;
@@ -194,30 +196,138 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public int[] getStationIds() {
         // TODO: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        int i = 0;
+        int[] stationIds = new int[stationCounter];
+
+        for(Integer stationId : stations.keySet()){
+            stationIds[i] = stationId;
+            i++;
+        }
+
+        return stationIds;
     }
 
     @Override
     public int addUnit(int stationId, UnitType type) throws IDNotRecognisedException, InvalidUnitException, IllegalStateException {
         // TODO: implement
+
+        int stationUnitCounter = 0;
+
+        Station station = stations.get(stationId);
+        if (station != null){
+            for (Unit unit : units.values()) {
+                if (unit.getstationId() == stationId){
+                    stationUnitCounter++;
+                }
+            }
+            if (stationUnitCounter < station.getmaxUnits()){
+                Unit unitNew;
+                switch (type) {
+                    case AMBULANCE:
+                        unitNew = new Ambulance(unitCounter, stationId, station.getx(), station.gety());
+                        break;
+                    case FIRE_ENGINE:
+                        unitNew = new FireEngine(unitCounter, stationId, station.getx(), station.gety());
+                        break;
+                    case POLICE_CAR:
+                        unitNew = new PoliceCar(unitCounter, stationId, station.getx(), station.gety());
+                        break;
+                
+                    default:
+                        // illigul type
+                        return -1;
+                }
+                // update map
+                cityMap.mapXY(station.getx(), station.gety()).addUnit(unitNew);
+                units.put(unitCounter++, unitNew);
+                return unitNew.getunitId();
+            }
+            else{
+                // station full
+            }
+        }
+        else{
+            // station not found
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void decommissionUnit(int unitId) throws IDNotRecognisedException, IllegalStateException {
         // TODO: implement
+
+        Unit unit = units.get(unitId);
+        if (unit.getUnitStatus() == UnitStatus.IDLE){
+            unit.decommissionUnit();
+            cityMap.mapXY(unit.getx(), unit.gety()).removeUnit(unit);
+        }
+        else{
+            // unit busy
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void transferUnit(int unitId, int newStationId) throws IDNotRecognisedException, IllegalStateException {
         // TODO: implement
+        Unit unit = units.get(unitId);
+        int stationUnitCounter = 0;
+        if (unit != null){
+            if (unit.getUnitStatus() == UnitStatus.IDLE){
+                Station station = stations.get(newStationId);
+                if (station != null){
+                    if (unit.getstationId() != newStationId){
+                        for (Unit unitInStation : units.values()) {
+                            if (unitInStation.getstationId() == newStationId){
+                                stationUnitCounter++;
+                            }
+                        }   
+                        if (stationUnitCounter < station.getmaxUnits()){
+                            unit.setstationId(newStationId);
+                            cityMap.mapXY(unit.getx(), unit.gety()).removeUnit(unit);
+                            unit.setx(station.getx());
+                            unit.sety(station.gety());
+                            cityMap.mapXY(unit.getx(), unit.gety()).addUnit(unit);
+                        }
+                        else{
+                            // new station full
+                        }
+                    }   
+                    else{
+                        // new station same as old
+                    }
+                }
+                else{
+                // station not found
+                }
+            }
+            else{
+                // unit not idle
+            }
+        }
+        else{
+            // unit not found
+        }
+
+        
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void setUnitOutOfService(int unitId, boolean outOfService) throws IDNotRecognisedException, IllegalStateException {
         // TODO: implement
+
+        Unit unit = units.get(unitId);
+        if(unit != null){
+            // out of service
+        }
+        else{
+            // unit not found
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -266,6 +376,15 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public void dispatch() {
         // TODO: implement
+
+        /* For each REPORTED incident (lowest id first),
+        assign the best eligible unit using tie-breakers.
+        Sets incident DISPATCHED and unit EN_ROUTE.   */
+
+        for (Incident incident : incidents.values()){
+            if (incident)
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -274,36 +393,79 @@ public class CityRescueImpl implements CityRescue {
         // TODO: implement
         tick += 1;
         ArrayList<Unit> enrouteUnits = new ArrayList<>();
+        ArrayList<Unit> workingUnits = new ArrayList<>();
+        int[][] directions = {{0,1},{1,0},{0,-1},{-1,0}};
+  
         for (Unit unit: units.values()){
             if (unit.getUnitStatus() == UnitStatus.EN_ROUTE){
                 enrouteUnits.add(unit);
+            }
+            else if (unit.getUnitStatus() == UnitStatus.AT_SCENE){
+                workingUnits.add(unit);
             }
             int ux = 0;
             int uy = 0;
             int ix = 0;
             int iy = 0;
+            int newux = 0;
+            int newuy = 0;
+
             for (Unit u: enrouteUnits){
                 ux = u.getx();
                 uy = u.gety();
                 
                 ix = incidents.get(u.getincident()).getx();
                 iy = incidents.get(u.getincident()).gety();
-
-                if (checkXYwithinBounds(ux, uy-1) && //north
-                    !cityMap.mapXY(ux, uy-1).isObstacle() && 
-                    (u.findmanhattandistance(ix, iy, ux, uy) > u.findmanhattandistance(ix, iy, ux, uy-1))){
-                    // move north  
+                int c = 0;
+                boolean flag = false;
+                for (int[] d: directions){
+                    newux = ux +d[0];
+                    newuy = uy +d[1];
+                    if (u.findmanhattandistance(ix, iy, ux, uy) > u.findmanhattandistance(ix, iy, newux, newuy)){
+                        if (checkXYwithinBounds(newux,newuy ) && 
+                            !cityMap.mapXY(newux, newuy).isObstacle()){
+                                unit.setx(newux);
+                                unit.sety(newuy);
+                                cityMap.mapXY(ux, uy).removeUnit(unit);
+                                cityMap.mapXY(newux, newuy).addUnit(unit);
+                                flag = true;
+                                break;
+                        }
                     }
-                else if (checkXYwithinBounds(ux+1, uy) && // east
-                    !cityMap.mapXY(ux+1, uy).isObstacle() && 
-                    (u.findmanhattandistance(ix, iy, ux, uy) > u.findmanhattandistance(ix, iy, ux+1, uy))){
-                    // move east
+                    c++;
                 }
-                
+                if (!flag){
+                    for (int[] d: directions){
+                        newux = ux +d[0];
+                        newuy = uy +d[1];
+                        if (checkXYwithinBounds(newux,newuy ) && !cityMap.mapXY(newux, newuy).isObstacle()){
+                                    unit.setx(newux);
+                                    unit.sety(newuy);
+                                    cityMap.mapXY(ux, uy).removeUnit(unit);
+                                    cityMap.mapXY(newux, newuy).addUnit(unit);
+                                    break;
+                        }
+                    }
+                }
+                if (unit.getx() == incidents.get(unit.getincident()).getx() && unit.gety() == incidents.get(unit.getincident()).gety()){
+                    unit.incrementstatus();
+                    incidents.get(unit.getincident()).incrementstatus();
+                }
             }
+            for (Unit u: workingUnits){
+                u.incrementwork();
+                if (u.getwork() == u.onsceneDuration()){
+                    u.setwork(0);
+                    u.setUnitStatus(UnitStatus.IDLE);
+                    incidents.get(unit.getincident()).incrementstatus();
+                    int x = incidents.get(unit.getincident()).getx();
+                    int y = incidents.get(unit.getincident()).gety();
+                    cityMap.mapXY(x,y).removeIncident();
+                    u.setincident(0);
+                }
+            }
+
         }
-
-
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

@@ -1,5 +1,3 @@
-
-
 package cityrescue;
 import cityrescue.enums.IncidentType;
 import cityrescue.enums.UnitStatus;
@@ -15,10 +13,10 @@ public abstract class Unit {
     protected int stationId;
 
     public Unit(int unitId, int stationId, int xcoord, int ycoord){
-        unitId = this.unitId;
-        stationId = this.stationId;
-        xcoord = this.xcoord;
-        ycoord = this.ycoord;
+        this.unitId = unitId;
+        this.stationId = stationId;
+        this.xcoord = xcoord;
+        this.ycoord = ycoord;
         unitStatus = UnitStatus.IDLE;
     }
 
@@ -49,6 +47,9 @@ public abstract class Unit {
     public void setstationId(int stationId){
         stationId = this.stationId;
     }
+    public void setUnitStatus(UnitStatus unitStatus){
+        unitStatus = unitStatus;
+    }
     public void incrementstatus(){
 
         UnitStatus[] values = UnitStatus.values();
@@ -57,8 +58,11 @@ public abstract class Unit {
             unitStatus = values[currentindex + 1];
         }
     }
-    public void decommissionUnit(){
+    public void outofserviceUnit(){
         unitStatus = UnitStatus.OUT_OF_SERVICE;
+    }
+    public void decommissionUnit(){
+        unitStatus = UnitStatus.DECOMMISSIONED;
     }
     public void setincident(int incident){
         incident = this.incident;

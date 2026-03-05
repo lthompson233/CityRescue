@@ -60,5 +60,9 @@ public class CitySquare{
         this.incident = incident;
     }
 
+    public void removeIncident(){
+        incident = null;
+    }
+
 }
 
