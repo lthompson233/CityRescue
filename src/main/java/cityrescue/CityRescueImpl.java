@@ -1,10 +1,19 @@
 package cityrescue;
 
-import cityrescue.enums.*;
-import cityrescue.exceptions.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import cityrescue.enums.IncidentStatus;
+import cityrescue.enums.IncidentType;
+import cityrescue.enums.UnitStatus;
+import cityrescue.enums.UnitType;
+import cityrescue.exceptions.IDNotRecognisedException;
+import cityrescue.exceptions.InvalidCapacityException;
+import cityrescue.exceptions.InvalidGridException;
+import cityrescue.exceptions.InvalidLocationException;
+import cityrescue.exceptions.InvalidNameException;
+import cityrescue.exceptions.InvalidSeverityException;
+import cityrescue.exceptions.InvalidUnitException;
 
 /**
  * CityRescueImpl (Starter)
@@ -28,9 +37,6 @@ public class CityRescueImpl implements CityRescue {
     private HashMap<Integer, Incident> incidents;
 
 
-    //private ArrayList<Station> stations;
-    //private ArrayList<Unit> units;
-    //private ArrayList<Incident> incidents;
 
     private int stationCounter = 0;
     private int unitCounter = 0;
