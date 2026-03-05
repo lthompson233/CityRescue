@@ -24,10 +24,10 @@ public class Incident {
         ycoord = y;
     }
 
-    public int getincidentxcoord(){
+    public int getx(){
         return xcoord;
     }
-    public int getincidentycoord(){
+    public int gety(){
         return ycoord;
     }
     public IncidentType getincidenttype(){
@@ -60,7 +60,9 @@ public class Incident {
         severity = this.severity;
     }
     public void cancelIncident(){
-        incidentStatus = IncidentStatus.CANCELLED;
+        if ((incidentStatus == IncidentStatus.REPORTED) &&(incidentStatus == IncidentStatus.DISPATCHED)){
+            incidentStatus = IncidentStatus.CANCELLED;
+        }
     }
 
 }
