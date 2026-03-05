@@ -17,8 +17,8 @@ public class Incident {
 
     
     public Incident(int incidentId, IncidentType incidenttype, int x, int y, int severity){
-        incidentId = this.incidentId;
-        incidenttype = this.incidenttype;
+        this.incidentId = incidentId;
+        this.incidenttype = incidenttype;
         incidentStatus = IncidentStatus.REPORTED;
         xcoord = x;
         ycoord = y;
@@ -58,7 +58,7 @@ public class Incident {
         }
     }
     public void setseverity(int severity){
-        severity = this.severity;
+        this.severity = severity;
     }
     public void cancelIncident(){
         incidentStatus = IncidentStatus.CANCELLED;

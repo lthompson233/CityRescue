@@ -9,10 +9,10 @@ public class Station {
     private int maxUnits;
     
     public Station(String stationname, int x, int y, int stationId){
-        stationname = this.stationname;
+        this.stationname = stationname;
         this.xcoord = x;
         this.ycoord = y;
-        stationId = this.stationId;
+        this.stationId = stationId;
 
     }
 

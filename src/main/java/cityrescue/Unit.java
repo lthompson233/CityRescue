@@ -45,10 +45,10 @@ public abstract class Unit {
         return stationId;
     }
     public void setstationId(int stationId){
-        stationId = this.stationId;
+        this.stationId = stationId;
     }
     public void setUnitStatus(UnitStatus unitStatus){
-        unitStatus = unitStatus;
+        this.unitStatus = unitStatus;
     }
     public void incrementstatus(){
 
@@ -65,7 +65,7 @@ public abstract class Unit {
         unitStatus = UnitStatus.DECOMMISSIONED;
     }
     public void setincident(int incident){
-        incident = this.incident;
+        this.incident = incident;
     }
     public int getwork(){
         return work;
@@ -75,7 +75,7 @@ public abstract class Unit {
         return work;
     }
     public void setwork(int work){
-        work = this.work;
+        this.work = work;
     }
     public int findmanhattandistance(int incidentx, int incidenty, int x,int y){
         return Math.abs((incidentx-x)+(incidenty-y));
