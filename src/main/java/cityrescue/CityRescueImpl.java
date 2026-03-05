@@ -117,6 +117,7 @@ public class CityRescueImpl implements CityRescue {
                     Station newStation = new Station(name, x, y, stationCounter);
                     stations.put(newStation.getstationId(), newStation);
                     cityMap.addStation(newStation);
+                    return stationCounter;
                 }
                 else{
                     throw new InvalidLocationException("there is already something there");
@@ -578,19 +579,17 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public String getStatus() {
         // TODO: implement
-        System.out.println("TICK ="+tick);
-        System.out.println("STATIONS="+stationCounter+" UNITS="+unitCounter+" INCIDENTS="+incidentCounter+" OBSTACLES="+obstacleCounter);
-        System.out.println("INCIDENTS");
-
+        String status = "TICK ="+tick +"\n" +"STATIONS="+stationCounter+" UNITS="+unitCounter+" INCIDENTS="+incidentCounter+" OBSTACLES="+obstacleCounter+"\n";
+        status +="INCIDENTS \n";
         for (Incident incident : incidents.values()){
-            System.out.println("I#"+incident.getincidentId()+ " TYPE="+incident.getincidenttype()+" SEV="+incident.getseverity()+" LOC=("+incident.getx()+","+incident.gety()+") STATUS="+incident.getincidenttype()+
-            " UNIT="+ ((incident.getunit() == 0) ? "-" : incident.getunit()));
+            status += "I#"+incident.getincidentId()+ " TYPE="+incident.getincidenttype()+" SEV="+incident.getseverity()+" LOC=("+incident.getx()+","+incident.gety()+") STATUS="+incident.getincidenttype()+
+            " UNIT="+ ((incident.getunit() == 0) ? "-" : incident.getunit())+"\n";
         }
 
-        System.out.println("UNITS");
+        status += "UNITS \n";
         for (Unit unit : units.values()){
-            System.out.println("U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+
-            " INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork())));
+            status+="U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+
+            " INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork()))+"\n";
         }
     }
 }
