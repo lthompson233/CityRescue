@@ -4,6 +4,7 @@ import cityrescue.enums.*;
 import cityrescue.exceptions.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * CityRescueImpl (Starter)
@@ -20,13 +21,19 @@ public class CityRescueImpl implements CityRescue {
     private final int MAX_INCIDENTS = 200;
 
 
-    private ArrayList<Station> stations;
-    private ArrayList<Unit> units;
-    private ArrayList<Incident> incidents;
+    private HashMap<Integer, Station> stations;
+    private HashMap<Integer, Unit> units;
+    private HashMap<Integer, Incident> incidents;
+
+
+    //private ArrayList<Station> stations;
+    //private ArrayList<Unit> units;
+    //private ArrayList<Incident> incidents;
 
     private int stationCounter = 0;
     private int unitCounter = 0;
     private int incidentCounter = 0;
+    private int obstacleCounter = 0;
 
     private int tick = 0;
 
@@ -70,6 +77,7 @@ public class CityRescueImpl implements CityRescue {
 
         if (checkXYwithinBounds(x, y)){
             cityMap.addObstacle(x, y);
+            obstacleCounter++;
         }
         else{
             // width or height zero or belo / bigger than bounds
@@ -84,6 +92,7 @@ public class CityRescueImpl implements CityRescue {
         
         if (checkXYwithinBounds(x, y)){
             cityMap.removeObstacle(x, y);
+            obstacleCounter--;
         }
         else{
             // width or height zero or belo / bigger than bounds
@@ -101,7 +110,7 @@ public class CityRescueImpl implements CityRescue {
                 if (cityMap.mapXY(x, y).isEmpty()){
                     stationCounter++;
                     Station newStation = new Station(name, x, y, stationCounter);
-                    stations.add(newStation);
+                    stations.put(newStation.getstationId(), newStation);
                     cityMap.addStation(newStation);
                 }
                 else{
@@ -123,39 +132,25 @@ public class CityRescueImpl implements CityRescue {
     public void removeStation(int stationId) throws IDNotRecognisedException, IllegalStateException {
         // TODO: implement
 
-        boolean stationFound = false;
         boolean stationHasNoUnits = true;
 
-        stationloop:
-
-        for (Station station : stations) {
-            if (station.getstationId() == stationId){
-
-                stationFound = true;
-
-                for (Unit unit : units) {
-                    if (unit.getstationId() == station.getstationId()){
-                        // bad
-                        stationHasNoUnits = false;
-                        break stationloop;
-                    }
-                }
-
-                if (stationHasNoUnits){
-                    cityMap.mapXY(station.getx(), station.gety()).setStation(null);
-                }
-                else{
+        Station station = stations.get(stationId);
+        if (station != null){
+            for (Unit unit : units.values()) {
+                if (unit.getstationId() == stationId){
                     // station has units
+                    stationHasNoUnits = false;
                 }
-
-                break stationloop;
+            }
+            if (stationHasNoUnits){
+                cityMap.mapXY(station.getx(), station.gety()).setStation(null);
+            }
+            else{
+                // station has units
             }
         }
-        if (!stationFound){
+        else{
             // station not found
-        }
-        else if(!stationHasNoUnits){
-            // station has atleast 1 unit
         }
 
         throw new UnsupportedOperationException("Not implemented yet");
@@ -165,46 +160,32 @@ public class CityRescueImpl implements CityRescue {
     public void setStationCapacity(int stationId, int maxUnits) throws IDNotRecognisedException, InvalidCapacityException {
         // TODO: implement
 
-        boolean stationFound = false;
-        boolean stationHasNoUnits = true;
-
         int stationUnitCounter = 0;
 
-        stationloop:
-
-        for (Station station : stations) {
-            if (station.getstationId() == stationId){
-
-                stationFound = true;
-
-                for (Unit unit : units) {
-                    if (unit.getstationId() == station.getstationId()){
-                        stationUnitCounter++;
-                    }
+        Station station = stations.get(stationId);
+        if (station != null){
+            for (Unit unit : units.values()) {
+                if (unit.getstationId() == stationId){
+                    stationUnitCounter++;
                 }
+            }
 
-                if (stationUnitCounter > maxUnits){
-                    // more units in station than maxUnits
-                }
-                else{
+            if (stationUnitCounter <= maxUnits){
+                if(maxUnits >= 1){
                     station.setmaxUnits(maxUnits);
                 }
-
-                if (stationHasNoUnits){
-                    cityMap.mapXY(station.getx(), station.gety()).setStation(null);
-                }
                 else{
-                    // station has units
+                    // maxUnits belo 1
                 }
-
-                break stationloop;
+                
             }
+            else{
+                // more units in station than maxUnits
+            }
+            
         }
-        if (!stationFound){
+        else{
             // station not found
-        }
-        else if(!stationHasNoUnits){
-            // station has atleast 1 unit
         }
 
         throw new UnsupportedOperationException("Not implemented yet");
@@ -292,24 +273,34 @@ public class CityRescueImpl implements CityRescue {
     public void tick() {
         // TODO: implement
         tick += 1;
-        ArrayList<Unit> enrouteUnits;
-        for (Unit unit: units){
+        ArrayList<Unit> enrouteUnits = new ArrayList<>();
+        for (Unit unit: units.values()){
             if (unit.getUnitStatus() == UnitStatus.EN_ROUTE){
                 enrouteUnits.add(unit);
             }
-        int ux = 0;
-        int uy = 0;
-        int ix = 0;
-        int iy = 0;
-        for (Unit u: enrouteUnits){
-            ux = u.getx();
-            uy = u.gety();
-            
-            /**if (checkXYwithinBounds(ux, uy-1) && 
-            !cityMap.mapXY(ux, uy-1).isObstacle() 
-            && (u.findmanhattandistance(,,ux, uy) > u.findmanhattandistance( , , ux, uy-1)))
-            **/
-        }
+            int ux = 0;
+            int uy = 0;
+            int ix = 0;
+            int iy = 0;
+            for (Unit u: enrouteUnits){
+                ux = u.getx();
+                uy = u.gety();
+                
+                ix = incidents.get(u.getincident()).getx();
+                iy = incidents.get(u.getincident()).gety();
+
+                if (checkXYwithinBounds(ux, uy-1) && //north
+                    !cityMap.mapXY(ux, uy-1).isObstacle() && 
+                    (u.findmanhattandistance(ix, iy, ux, uy) > u.findmanhattandistance(ix, iy, ux, uy-1))){
+                    // move north  
+                    }
+                else if (checkXYwithinBounds(ux+1, uy) && // east
+                    !cityMap.mapXY(ux+1, uy).isObstacle() && 
+                    (u.findmanhattandistance(ix, iy, ux, uy) > u.findmanhattandistance(ix, iy, ux+1, uy))){
+                    // move east
+                }
+                
+            }
         }
 
 
@@ -322,11 +313,13 @@ public class CityRescueImpl implements CityRescue {
         System.out.println("TICK ="+tick);
         System.out.println("STATIONS="+stationCounter+" UNITS="+unitCounter+" INCIDENTS="+incidentCounter+" OBSTACLES="+obstacleCounter);
         System.out.println("INCIDENTS");
-        for (Incident incident : incidents){
+
+        for (Incident incident : incidents.values()){
             System.out.println("I#"+incident.getincidentId()+ " TYPE="+incident.getincidenttype()+" SEV="+incident.getseverity()+" LOC=("+incident.getx()+","+incident.gety()+") STATUS="+incident.getincidenttype()+
             " UNIT="+ ((incident.getunit() == 0) ? "-" : incident.getunit()));
         }
-        for (Unit unit : units){
+
+        for (Unit unit : units.values()){
             System.out.println("UNITS");
             System.out.println("U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+
             " INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork())));
