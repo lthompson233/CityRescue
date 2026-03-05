@@ -18,7 +18,10 @@ public class CitySquare{
         this.y = y;
     }
 
-    
+    public boolean isEmpty()
+    {
+        return (units.isEmpty() && incident != null  && station != null && !obstacle);
+    }
 
     public ArrayList<Unit> getUnits(){
         return units;

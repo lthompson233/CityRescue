@@ -16,9 +16,10 @@ public class CityRescueImpl implements CityRescue {
     CityMap cityMap;
 
     int MAX_STATIONS = 20;
-    
+
 
     private ArrayList<Station> stations;
+    private ArrayList<Unit> units;
     private int stationCounter = 0;
 
 
@@ -88,12 +89,20 @@ public class CityRescueImpl implements CityRescue {
         // TODO: implement
 
         if (checkXYwithinBounds(x, y)){
-
-            stationCounter++;
-            stations.add(new Station(name, x, y, stationCounter));
-            
-
-            cityMap.addStation(x, y)
+            if (stationCounter < MAX_STATIONS){
+                if (cityMap.mapXY(x, y).isEmpty()){
+                    stationCounter++;
+                    Station newStation = new Station(name, x, y, stationCounter);
+                    stations.add(newStation);
+                    cityMap.addStation(newStation);
+                }
+                else{
+                    // obstruction
+                }
+            }
+            else{
+                // max stations reached
+            }
         }
         else{
             // width or height zero or belo / bigger than bounds
@@ -105,12 +114,91 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public void removeStation(int stationId) throws IDNotRecognisedException, IllegalStateException {
         // TODO: implement
+
+        boolean stationFound = false;
+        boolean stationHasNoUnits = true;
+
+        stationloop:
+
+        for (Station station : stations) {
+            if (station.getstationId() == stationId){
+
+                stationFound = true;
+
+                for (Unit unit : units) {
+                    if (unit.getstationId() == station.getstationId()){
+                        // bad
+                        stationHasNoUnits = false;
+                        break stationloop;
+                    }
+                }
+
+                if (stationHasNoUnits){
+                    cityMap.mapXY(station.getx(), station.gety()).setStation(null);
+                }
+                else{
+                    // station has units
+                }
+
+                break stationloop;
+            }
+        }
+        if (!stationFound){
+            // station not found
+        }
+        else if(!stationHasNoUnits){
+            // station has atleast 1 unit
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public void setStationCapacity(int stationId, int maxUnits) throws IDNotRecognisedException, InvalidCapacityException {
         // TODO: implement
+
+        boolean stationFound = false;
+        boolean stationHasNoUnits = true;
+
+        int stationUnitCounter = 0;
+
+        stationloop:
+
+        for (Station station : stations) {
+            if (station.getstationId() == stationId){
+
+                stationFound = true;
+
+                for (Unit unit : units) {
+                    if (unit.getstationId() == station.getstationId()){
+                        stationUnitCounter++;
+                    }
+                }
+
+                if (stationUnitCounter > maxUnits){
+                    // more units in station than maxUnits
+                }
+                else{
+                    station.setmaxUnits(maxUnits);
+                }
+
+                if (stationHasNoUnits){
+                    cityMap.mapXY(station.getx(), station.gety()).setStation(null);
+                }
+                else{
+                    // station has units
+                }
+
+                break stationloop;
+            }
+        }
+        if (!stationFound){
+            // station not found
+        }
+        else if(!stationHasNoUnits){
+            // station has atleast 1 unit
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
