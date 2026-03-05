@@ -15,12 +15,20 @@ public class CityRescueImpl implements CityRescue {
 
     CityMap cityMap;
 
-    int MAX_STATIONS = 20;
+    private final int MAX_STATIONS = 20;
+    private final int MAX_UNITS = 50;
+    private final int MAX_INCIDENTS = 200;
 
 
     private ArrayList<Station> stations;
     private ArrayList<Unit> units;
+    private ArrayList<Incident> incidents;
+
     private int stationCounter = 0;
+    private int unitCounter = 0;
+    private int incidentCounter = 0;
+
+    private int tick = 0;
 
 
     // TODO: add fields (map, arrays for stations/units/incidents, counters, tick, etc.)
@@ -283,12 +291,47 @@ public class CityRescueImpl implements CityRescue {
     @Override
     public void tick() {
         // TODO: implement
+        tick += 1;
+        ArrayList<Unit> enrouteUnits;
+        for (Unit unit: units){
+            if (unit.getUnitStatus() == UnitStatus.EN_ROUTE){
+                enrouteUnits.add(unit);
+            }
+        int ux = 0;
+        int uy = 0;
+        int ix = 0;
+        int iy = 0;
+        for (Unit u: enrouteUnits){
+            ux = u.getx();
+            uy = u.gety();
+            
+            /**if (checkXYwithinBounds(ux, uy-1) && 
+            !cityMap.mapXY(ux, uy-1).isObstacle() 
+            && (u.findmanhattandistance(,,ux, uy) > u.findmanhattandistance( , , ux, uy-1)))
+            **/
+        }
+        }
+
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public String getStatus() {
         // TODO: implement
+        System.out.println("TICK ="+tick);
+        System.out.println("STATIONS="+stationCounter+" UNITS="+unitCounter+" INCIDENTS="+incidentCounter+" OBSTACLES="+obstacleCounter);
+        System.out.println("INCIDENTS");
+        for (Incident incident : incidents){
+            System.out.println("I#"+incident.getincidentId()+ " TYPE="+incident.getincidenttype()+" SEV="+incident.getseverity()+" LOC=("+incident.getx()+","+incident.gety()+") STATUS="+incident.getincidenttype()+
+            " UNIT="+ ((incident.getunit() == 0) ? "-" : incident.getunit()));
+        }
+        for (Unit unit : units){
+            System.out.println("UNITS");
+            System.out.println("U#"+unit.getunitId()+" TYPE="+unit.getunittype()+" HOME="+unit.getstationId()+" LOC=("+unit.getx()+","+unit.gety()+") STATUS="+unit.getUnitStatus()+
+            " INCIDENT"+((unit.getincident() == 0) ? "-" : unit.getincident()) +  ((unit.getwork() == 0) ? " " : (" WORK="+unit.getwork())));
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

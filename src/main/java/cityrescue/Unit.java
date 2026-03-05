@@ -3,6 +3,7 @@
 package cityrescue;
 import cityrescue.enums.IncidentType;
 import cityrescue.enums.UnitStatus;
+import cityrescue.enums.UnitType;
 
 public abstract class Unit {
     protected int unitId;
@@ -36,7 +37,7 @@ public abstract class Unit {
     public void sety(int y){
         ycoord = y;
     }
-    public UnitStatus getunUnitStatus(){
+    public UnitStatus getUnitStatus(){
         return unitStatus;
     }
     public int getincident(){
@@ -72,9 +73,10 @@ public abstract class Unit {
     public void setwork(int work){
         work = this.work;
     }
-    public int findmanhattandistance(int incidentx, int incidenty){
-        return Math.abs((incidentx-xcoord)+(incidenty-ycoord));
+    public int findmanhattandistance(int incidentx, int incidenty, int x,int y){
+        return Math.abs((incidentx-x)+(incidenty-y));
     }
     public abstract IncidentType handlingrules();
     public abstract int onsceneDuration();
+    public abstract UnitType getunittype();
 }

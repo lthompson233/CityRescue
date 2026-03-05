@@ -1,7 +1,7 @@
-
 package cityrescue;
 
 import cityrescue.enums.IncidentType;
+import cityrescue.enums.UnitType;
 
 public class FireEngine extends Unit {
     public FireEngine(int unitId, int stationId, int x, int y){
@@ -12,5 +12,8 @@ public class FireEngine extends Unit {
     }
     public int onsceneDuration(){
         return 4;
+    }
+    public UnitType getunittype(){
+        return UnitType.FIRE_ENGINE;
     }
 }
