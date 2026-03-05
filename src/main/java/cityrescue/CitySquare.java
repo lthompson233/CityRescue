@@ -8,6 +8,8 @@ public class CitySquare{
     private ArrayList<Unit> units;
     private Incident incident;
     private Station station;
+
+    private boolean obstacle = false;
     
     // private Obstical obstical
 
@@ -30,7 +32,14 @@ public class CitySquare{
         return station;
     }
 
+    public boolean isObstacle(){
+        return obstacle;
+    }
+
     
+    public void setObstacle(boolean bool){
+        obstacle = bool;
+    }
 
     public void addUnit(Unit unit){
         units.add(unit);

@@ -20,16 +20,11 @@ public class CityMap {
         this.width = width;
         this.height = height;
 
-        if (width > 0 && height > 0){
-            for (int y = 0; y < height; y++){
-                for (int x = 0; x < width; x++){
-                    map[y][x] = new CitySquare(x, y);
-                    System.out.println(x + " : " + y);
-                }
+        for (int y = 0; y < height; y++){
+            for (int x = 0; x < width; x++){
+                map[y][x] = new CitySquare(x, y);
+                System.out.println(x + " : " + y);
             }
-        }
-        else{
-            // width < 0 or height < 0
         }
 
         
@@ -46,14 +41,16 @@ public class CityMap {
         return new int[] { width, height };
     }
 
-    /** 
-    public void addObstacle(Obstacle obstacle){
-        // add obstacle
+     
+    public void addObstacle(int x, int y){
+        mapXY(x, y).setObstacle(true);
     }
 
-    public void removeObstacle(Obstacle obstacle){
-        // remove obstacle
+    public void removeObstacle(int x, int y){
+        mapXY(x, y).setObstacle(false);
     }
+
+    /**
 
     public void addUnit(Unit unit){
         // add unit
@@ -81,14 +78,10 @@ public class CityMap {
     */
 
     public void addStation(Station station){
-        // add station
-
         mapXY(station.getx(), station.gety()).setStation(station);
     }
 
     public void removeStation(Station station){
-        // remove station
-
         mapXY(station.getx(), station.gety()).setStation(null);
     }
 }
