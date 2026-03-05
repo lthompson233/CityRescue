@@ -16,11 +16,12 @@ public class CitySquare{
     public CitySquare(int x, int y){
         this.x = x;
         this.y = y;
+        units = new ArrayList<>();
     }
 
     public boolean isEmpty()
     {
-        return (units.isEmpty() && incident != null  && station != null && !obstacle);
+        return (units.isEmpty() && incident == null  && station == null && !obstacle);
     }
 
     public ArrayList<Unit> getUnits(){

@@ -13,6 +13,7 @@ public class Station {
         this.xcoord = x;
         this.ycoord = y;
         this.stationId = stationId;
+        maxUnits = 10;
 
     }
 

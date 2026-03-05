@@ -23,7 +23,6 @@ public class CityMap {
         for (int y = 0; y < height; y++){
             for (int x = 0; x < width; x++){
                 map[y][x] = new CitySquare(x, y);
-                System.out.println(x + " : " + y);
             }
         }
 
